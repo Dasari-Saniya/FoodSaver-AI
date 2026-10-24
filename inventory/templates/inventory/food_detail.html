@@ -1,0 +1,177 @@
+{% extends 'inventory/base.html' %}
+
+{% block title %}{{ item.name }} — FoodSaver AI{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-9">
+        <nav aria-label="breadcrumb" class="mb-3">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    {% if user.profile.is_ngo and not user.is_staff %}
+                        <a href="{% url 'ngo_dashboard' %}" class="text-decoration-none">Surplus Rescue</a>
+                    {% else %}
+                        <a href="{% url 'inventory_list' %}" class="text-decoration-none">My Inventory</a>
+                    {% endif %}
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">{{ item.name }}</li>
+            </ol>
+        </nav>
+
+        <div class="card p-4 p-md-5">
+            <!-- Header Section -->
+            <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 border-bottom pb-4 mb-4">
+                <div>
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <span class="badge bg-light text-dark border">{{ item.category }}</span>
+                        {% if item.expiry_status == 'Expired' %}
+                            <span class="badge-status status-expired">Expired</span>
+                        {% elif item.expiry_status == 'Critical' %}
+                            <span class="badge-status status-critical">Critical (≤ 2d)</span>
+                        {% elif item.expiry_status == 'Medium' %}
+                            <span class="badge-status status-medium">Medium (3–7d)</span>
+                        {% else %}
+                            <span class="badge-status status-low">Low (&gt; 7d)</span>
+                        {% endif %}
+                    </div>
+                    <h2 class="fw-bold mb-1" style="color: var(--color-primary);">{{ item.name }}</h2>
+                    {% if item.batch_number %}
+                        <span class="text-muted small"><i class="bi bi-upc me-1"></i>Batch/Lot: <strong>{{ item.batch_number }}</strong></span>
+                    {% endif %}
+                </div>
+
+                {% if can_edit %}
+                    <div class="d-flex gap-2">
+                        <a href="{% url 'food_update' item.pk %}" class="btn btn-outline-secondary btn-sm">
+                            <i class="bi bi-pencil me-1"></i> Edit Item
+                        </a>
+                        <a href="{% url 'food_delete' item.pk %}" class="btn btn-outline-danger btn-sm">
+                            <i class="bi bi-trash me-1"></i> Delete
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Key Metric Highlights -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <div class="p-3 bg-light rounded-3 h-100 border">
+                        <div class="text-muted small fw-semibold text-uppercase">Stock Quantity</div>
+                        <div class="fs-4 fw-bold mt-1 text-success">
+                            {{ item.quantity }} <span class="fs-6 text-muted">{{ item.unit }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="p-3 bg-light rounded-3 h-100 border">
+                        <div class="text-muted small fw-semibold text-uppercase">Expiry &amp; Shelf Life</div>
+                        <div class="fs-5 fw-bold mt-1">
+                            {{ item.expiry_date }}
+                        </div>
+                        <div class="small mt-1">
+                            {% if item.days_until_expiry < 0 %}
+                                <span class="text-muted fw-semibold">
+                                    <i class="bi bi-clock-history me-1"></i>Expired {{ item.days_until_expiry|stringformat:"+d"|slice:"1:" }} day(s) ago
+                                </span>
+                            {% elif item.days_until_expiry == 0 %}
+                                <span class="text-danger fw-bold">
+                                    <i class="bi bi-exclamation-circle-fill me-1"></i>Expires TODAY
+                                </span>
+                            {% elif item.days_until_expiry <= 2 %}
+                                <span class="text-danger fw-bold">
+                                    <i class="bi bi-alarm-fill me-1"></i>Expires in {{ item.days_until_expiry }} day(s)
+                                </span>
+                            {% else %}
+                                <span class="text-muted">
+                                    <i class="bi bi-hourglass-split me-1"></i>{{ item.days_until_expiry }} day(s) remaining
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="p-3 bg-light rounded-3 h-100 border">
+                        <div class="text-muted small fw-semibold text-uppercase">Waste Risk Assessment</div>
+                        <div class="fs-5 fw-bold mt-1 text-{% if item.waste_risk_score >= 85 %}danger{% elif item.waste_risk_score >= 50 %}warning{% else %}success{% endif %}">
+                            {{ item.waste_risk_score }}% ({{ item.waste_risk_level }})
+                        </div>
+                        <div class="small text-muted mt-1">
+                            AI Rule-based loss probability
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detailed Specifications -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <div class="p-3 border rounded bg-white h-100">
+                        <span class="text-muted small fw-semibold text-uppercase d-block mb-1">
+                            <i class="bi bi-geo-alt me-1 text-success"></i> Storage &amp; Handling Location
+                        </span>
+                        <div>
+                            {% if item.storage_location %}
+                                <strong>{{ item.storage_location }}</strong>
+                            {% else %}
+                                <span class="text-muted fst-italic">Not specified</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="p-3 border rounded bg-white h-100">
+                        <span class="text-muted small fw-semibold text-uppercase d-block mb-1">
+                            <i class="bi bi-building me-1 text-success"></i> Provider / Donor Organization
+                        </span>
+                        <div>
+                            <strong>{{ item.donor_info|default:item.added_by.profile.organization_name|default:item.added_by.username }}</strong>
+                            {% if item.added_by.profile.phone %}
+                                <div class="text-muted small"><i class="bi bi-telephone me-1"></i>{{ item.added_by.profile.phone }}</div>
+                            {% endif %}
+                            {% if item.added_by.profile.address %}
+                                <div class="text-muted small"><i class="bi bi-pin-map me-1"></i>{{ item.added_by.profile.address }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="p-3 border rounded bg-white">
+                        <span class="text-muted small fw-semibold text-uppercase d-block mb-1">
+                            <i class="bi bi-card-text me-1 text-success"></i> Description &amp; Notes
+                        </span>
+                        {% if item.description %}
+                            <p class="mb-0 text-secondary" style="white-space: pre-wrap;">{{ item.description }}</p>
+                        {% else %}
+                            <p class="text-muted fst-italic mb-0">No special handling notes provided.</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="p-3 bg-light rounded border text-muted small d-flex flex-wrap justify-content-between gap-2">
+                        <div><i class="bi bi-calendar-plus me-1"></i> <strong>Logged:</strong> {{ item.date_added|date:"M d, Y, H:i" }}</div>
+                        <div><i class="bi bi-clock-history me-1"></i> <strong>Last Updated:</strong> {{ item.date_updated|date:"M d, Y, H:i" }}</div>
+                        <div><i class="bi bi-person me-1"></i> <strong>Owner:</strong> {{ item.added_by.username|default:"System" }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pt-3 border-top">
+                {% if user.profile.is_ngo and not user.is_staff %}
+                    <a href="{% url 'ngo_dashboard' %}" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left me-1"></i> Back to Surplus Rescue
+                    </a>
+                {% else %}
+                    <a href="{% url 'inventory_list' %}" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left me-1"></i> Back to My Inventory
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

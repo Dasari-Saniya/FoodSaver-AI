@@ -1,0 +1,198 @@
+{% extends 'inventory/base.html' %}
+
+{% block title %}NGO Food Rescue Portal — FoodSaver AI{% endblock %}
+
+{% block content %}
+<!-- NGO Portal Hero -->
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3 pb-2 border-bottom">
+    <div>
+        <div class="d-flex align-items-center gap-2 mb-1">
+            <span class="badge bg-info text-dark badge-role">NGO &amp; Community Kitchen Portal</span>
+            <span class="text-muted small">Surplus Identification &amp; Redistribution</span>
+        </div>
+        <h2 class="fw-bold mb-1" style="color: var(--color-primary);">Available Food Surplus for Rescue</h2>
+        <p class="text-muted small mb-0">
+            Browse verified surplus donations from registered local food providers and restaurants ready for immediate distribution to those in need.
+        </p>
+    </div>
+</div>
+
+<!-- Available Surplus Metrics -->
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-4">
+        <div class="card p-3 h-100">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="text-muted small fw-semibold text-uppercase">Total Available Surplus</span>
+                    <h3 class="fw-bold mb-0 mt-1">{{ total_surplus }}</h3>
+                    <span class="text-muted small">Active donation listings</span>
+                </div>
+                <div class="p-3 rounded-circle" style="background-color: var(--color-sage-soft); color: var(--color-primary);">
+                    <i class="bi bi-gift fs-4"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4">
+        <div class="card p-3 h-100" style="border-left: 4px solid var(--color-critical);">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="text-muted small fw-semibold text-uppercase">Critical Urgency (≤ 2d)</span>
+                    <h3 class="fw-bold mb-0 mt-1 text-danger">{{ critical_surplus }}</h3>
+                    <span class="text-danger small">Requires immediate pickup</span>
+                </div>
+                <div class="p-3 rounded-circle" style="background-color: var(--color-critical-bg); color: var(--color-critical);">
+                    <i class="bi bi-alarm fs-4"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-md-4">
+        <div class="card p-3 h-100" style="border-left: 4px solid var(--color-warning);">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="text-muted small fw-semibold text-uppercase">Medium Urgency (3–7d)</span>
+                    <h3 class="fw-bold mb-0 mt-1" style="color: var(--color-warning);">{{ medium_surplus }}</h3>
+                    <span class="text-muted small">Schedule pickup this week</span>
+                </div>
+                <div class="p-3 rounded-circle" style="background-color: var(--color-warning-bg); color: var(--color-warning);">
+                    <i class="bi bi-clock-history fs-4"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Search & Filtering Toolbar -->
+<div class="card p-3 mb-4">
+    <form method="get" class="row g-2 align-items-end">
+        <div class="col-md-4">
+            <label class="form-label small fw-bold text-muted mb-1">Search Food or Donor</label>
+            <div class="input-group">
+                <span class="input-group-text bg-light border-end-0"><i class="bi bi-search text-muted"></i></span>
+                <input type="text" name="q" value="{{ search_query }}" class="form-control border-start-0" placeholder="Search item, provider, or notes...">
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label small fw-bold text-muted mb-1">Category</label>
+            <select name="category" class="form-select">
+                <option value="">All Categories</option>
+                {% for code, label in categories %}
+                    <option value="{{ code }}" {% if category_filter == code %}selected{% endif %}>{{ code }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label small fw-bold text-muted mb-1">Urgency Level</label>
+            <select name="status" class="form-select">
+                <option value="">All Urgency Levels</option>
+                <option value="Critical" {% if status_filter == 'Critical' %}selected{% endif %}>Critical Urgency (≤ 2 days)</option>
+                <option value="Medium" {% if status_filter == 'Medium' %}selected{% endif %}>Medium Urgency (3–7 days)</option>
+                <option value="Low" {% if status_filter == 'Low' %}selected{% endif %}>Low Urgency (&gt; 7 days)</option>
+            </select>
+        </div>
+
+        <div class="col-md-2 d-flex gap-1">
+            <button type="submit" class="btn btn-success w-100" title="Apply Filters">
+                <i class="bi bi-funnel me-1"></i> Filter
+            </button>
+            {% if search_query or category_filter or status_filter %}
+                <a href="{% url 'ngo_dashboard' %}" class="btn btn-outline-secondary" title="Clear Filters">
+                    <i class="bi bi-x-circle"></i>
+                </a>
+            {% endif %}
+        </div>
+    </form>
+</div>
+
+<!-- Available Surplus Table -->
+<div class="card overflow-hidden">
+    <div class="card-header py-3 d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 fw-bold">Active Surplus Listings ({{ items|length }})</h5>
+        <span class="text-muted small">Updated in real-time</span>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light text-muted small text-uppercase">
+                <tr>
+                    <th>Food Item</th>
+                    <th>Category</th>
+                    <th>Available Quantity</th>
+                    <th>Expiry Date</th>
+                    <th>Urgency Level</th>
+                    <th>Provider / Donor</th>
+                    <th>Waste Risk</th>
+                    <th class="text-end">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'food_detail' item.pk %}" class="fw-semibold text-decoration-none text-dark">
+                                {{ item.name }}
+                            </a>
+                            {% if item.description %}
+                                <div class="text-muted small text-truncate" style="max-width: 220px;">{{ item.description }}</div>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="badge bg-light text-dark border">{{ item.category }}</span>
+                        </td>
+                        <td>
+                            <strong class="text-success">{{ item.quantity }}</strong> <span class="text-muted small">{{ item.unit }}</span>
+                        </td>
+                        <td>
+                            <span>{{ item.expiry_date }}</span>
+                        </td>
+                        <td>
+                            {% if item.expiry_status == 'Critical' %}
+                                <span class="badge-status status-critical">Critical ({{ item.days_until_expiry }}d left)</span>
+                            {% elif item.expiry_status == 'Medium' %}
+                                <span class="badge-status status-medium">Medium ({{ item.days_until_expiry }}d left)</span>
+                            {% else %}
+                                <span class="badge-status status-low">Low ({{ item.days_until_expiry }}d left)</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div>
+                                <strong>{{ item.donor_info|default:item.added_by.profile.organization_name|default:item.added_by.username }}</strong>
+                            </div>
+                            {% if item.added_by.profile.phone %}
+                                <div class="text-muted small"><i class="bi bi-telephone me-1"></i>{{ item.added_by.profile.phone }}</div>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="badge bg-{% if item.waste_risk_score >= 85 %}danger{% elif item.waste_risk_score >= 50 %}warning text-dark{% else %}success{% endif %} small">
+                                {{ item.waste_risk_score }}% {{ item.waste_risk_level }}
+                            </span>
+                        </td>
+                        <td class="text-end">
+                            <a href="{% url 'food_detail' item.pk %}" class="btn btn-sm btn-outline-success">
+                                <i class="bi bi-eye me-1"></i> View Details
+                            </a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center py-5">
+                            <i class="bi bi-check2-circle fs-1 text-muted d-block mb-3"></i>
+                            <h6 class="fw-bold mb-1">No Active Surplus Items Right Now</h6>
+                            <p class="text-muted small mb-0">
+                                {% if search_query or category_filter or status_filter %}
+                                    No available surplus matches your current filter criteria.
+                                {% else %}
+                                    All current surplus items have been allocated or expired. Check back soon!
+                                {% endif %}
+                            </p>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

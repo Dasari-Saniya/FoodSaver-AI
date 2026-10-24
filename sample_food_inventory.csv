@@ -1,0 +1,21 @@
+food_name,category,quantity,unit,expiry_date,batch_number,storage_location,description,donor_info
+Organic Strawberries,Produce,8.50,kg,2026-10-16,LOT-PRD-01,Cold Room A,Fresh ripe strawberries in 500g punnets,Green Valley Orchards
+Fresh Whole Milk,Dairy,24.00,litres,2026-10-16,LOT-DRY-02,Dairy Cooler 1,1L pasteurized milk cartons at 3C,Sunshine Valley Dairy
+Artisan Sourdough Batard,Bakery,12.00,units,2026-10-15,LOT-BAK-03,Bakery Rack,Freshly baked hearth sourdough loaves,Downtown Hearth Bakery
+Premium Beef Mince,Meat,7.50,kg,2026-10-17,LOT-MEA-04,Meat Chiller 2,Vacuum-sealed ground beef cuts,Metro Butchery
+Atlantic Salmon Portions,Seafood,5.00,kg,2026-10-15,LOT-SEA-05,Fish Ice Storage,Fresh chilled boneless salmon fillets,Harbor Seafood Market
+Caesar Chicken Salad Bowls,Prepared Meals,15.00,portions,2026-10-16,LOT-PREP-06,Deli Display,Pre-packaged gourmet chicken caesar salad,City Central Deli
+Ripe Cavendish Bananas,Produce,18.00,kg,2026-10-18,LOT-PRD-07,Produce Stand,Sweet table bananas showing sugar spots,Green Valley Supermarket
+Greek Style Natural Yogurt,Dairy,16.00,units,2026-10-19,LOT-DRY-08,Dairy Cooler 2,500g tubs natural strained yogurt,Sunshine Valley Dairy
+Whole Wheat Sandwich Bread,Bakery,20.00,units,2026-10-18,LOT-BAK-09,Bakery Trays,Sliced sandwich loaves with intact packaging,Golden Crust Bakes
+Free-Range Chicken Thighs,Meat,9.00,kg,2026-10-19,LOT-MEA-10,Meat Chiller 1,Skinless chicken thighs in thermoform packs,Green Pastures Farm
+Vegetable Stir-Fry Kits,Prepared Meals,10.00,packs,2026-10-20,LOT-PREP-11,Chiller 3,Pre-washed chopped broccoli carrots and peas,City Central Deli
+Fresh Squeezed Orange Juice,Beverages,14.00,litres,2026-10-21,LOT-BEV-12,Juice Cooler B,100% pure cold-pressed citrus juice 1L,Orchard Fresh Drinks
+Organic Baby Spinach,Produce,6.00,packs,2026-10-14,LOT-PRD-13,Chiller 4,Past best-before date for waste audit,Green Valley Orchards
+Fresh Ricotta Cheese,Dairy,4.00,units,2026-10-13,LOT-DRY-14,Returns Shelf,Expired 2 days ago for composting audit,Sunshine Valley Dairy
+Butter Croissants (6-pack),Bakery,5.00,boxes,2026-10-14,LOT-BAK-15,Bakery Returns,Past shelf date demonstration record,Downtown Hearth Bakery
+Yellowfin Tuna Steaks,Seafood,8.00,kg,2026-10-25,LOT-SEA-16,Deep Freezer,Flash-frozen sashimi-grade tuna loins,Oceanic Imports
+Italian Chopped Tomatoes,Pantry,48.00,cans,2027-04-15,LOT-PAN-17,Pantry Aisle 4,400g canned tomatoes in juice,Global Pantry Supply
+Dried Green Lentils,Pantry,25.00,kg,2027-10-15,LOT-PAN-18,Dry Grains Bin,High-protein dry bulk pulses in sealed bags,Global Pantry Supply
+Organic Cold Brew Coffee,Beverages,24.00,units,2026-11-05,LOT-BEV-19,Dry Shelf,330ml ready-to-drink nitro cold brew cans,Artisan Roasters
+Smoked Turkey Breast Slices,Meat,12.00,packs,2026-10-27,LOT-MEA-20,Meat Chiller 4,200g vacuum-sealed sliced deli turkey breast,Metro Butchery
