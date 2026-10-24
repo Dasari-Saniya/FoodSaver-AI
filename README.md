@@ -187,10 +187,7 @@ B.Tech — Computer Science and Engineering, 2027 Batch
 - GitHub: https://github.com/Dasari-Saniya
 - LinkedIn: https://www.linkedin.com/in/dasari-saniya/
 
+
 ## Disclaimer
 
-<<<<<<< HEAD
 This project is under active development. Features, setup requirements, and supported workflows may change as additional milestones are implemented and validated.
-=======
-This project is under active development. Features, setup requirements, and supported workflows may change as additional milestones are implemented and validated.
->>>>>>> 8399172de61990ab0f6660e75cf486c3ebbb4f8d
